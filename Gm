@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aviator Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1e1e2f;
+      color: #ffffff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    #game-container {
+      margin: 50px auto;
+      width: 300px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #2e2e3e;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+    h1 {
+      font-size: 24px;
+    }
+    .multiplier {
+      font-size: 36px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .btn {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-start {
+      background-color: #28a745;
+      color: white;
+    }
+    .btn-cashout {
+      background-color: #ffc107;
+      color: black;
+    }
+    .btn:disabled {
+      background-color: #6c757d;
+      cursor: not-allowed;
+    }
+    .message {
+      font-size: 18px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <h1>Aviator Game</h1>
+    <div class="multiplier" id="multiplier-display">1.00x</div>
+    <button class="btn btn-start" id="start-btn">Start Game</button>
+    <button class="btn btn-cashout" id="cashout-btn" disabled>Cash Out</button>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    // Variables
+    let multiplier = 1.0;
+    let crashPoint = 0;
+    let interval = null;
+    let isGameRunning = false;
+    const multiplierDisplay = document.getElementById('multiplier-display');
+    const startBtn = document.getElementById('start-btn');
+    const cashoutBtn = document.getElementById('cashout-btn');
+    const messageDisplay = document.getElementById('message');
+
+    // Function to generate a random crash point (e.g., between 1.5x and 10x)
+    function generateCrashPoint() {
+      return parseFloat((Math.random() * 8 + 1.5).toFixed(2));
+    }
+
+    // Start the game
+    function startGame() {
+      if (isGameRunning) return;
+
+      multiplier = 1.0;
+      crashPoint = generateCrashPoint();
+      isGameRunning = true;
+      messageDisplay.textContent = '';
+      startBtn.disabled = true;
+      cashoutBtn.disabled = false;
+      updateMultiplier();
+    }
+
+    // Update the multiplier
+    function updateMultiplier() {
+      interval = setInterval(() => {
+        if (multiplier >= crashPoint) {
+          gameOver(false);
+        } else {
+          multiplier += 0.1;
+          multiplierDisplay.textContent = multiplier.toFixed(2) + 'x';
+        }
+      }, 100); // Update every 100ms
+    }
+
+    // Cash out function
+    function cashOut() {
+      if (!isGameRunning) return;
+
+      gameOver(true);
+    }
+
+    // End the game
+    function gameOver(isCashOut) {
+      clearInterval(interval);
+      isGameRunning = false;
+      startBtn.disabled = false;
+      cashoutBtn.disabled = true;
+
+      if (isCashOut) {
+        messageDisplay.textContent = `You cashed out at ${multiplier.toFixed(2)}x! 🎉`;
+      } else {
+        messageDisplay.textContent = `Game crashed at ${crashPoint.toFixed(2)}x. 💥`;
+      }
+    }
+
+    // Event Listeners
+    startBtn.addEventListener('click', startGame);
+    cashoutBtn.addEventListener('click', cashOut);
+  </script>
+</body>
+</html>
